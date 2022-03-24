@@ -1,6 +1,6 @@
+import json
 import pickle
 import numpy as np
-import matplotlib.pyplot as plt
 import cv2
 from sklearn.preprocessing import Normalizer
 
@@ -29,19 +29,19 @@ def normalize(img):
     return (img - mean) / std
 
 
-def plt_show(cv_img):
-    img_rgb = cv2.cvtColor(cv_img, cv2.COLOR_BGR2RGB)
-    plt.imshow(img_rgb)
-    plt.show()
-
-
 def load_pickle(path):
     with open(path, 'rb') as f:
         encoding_dict = pickle.load(f)
     return encoding_dict
 
+    
+def load_json(path):
+    with open(path, "r") as read_file:
+         decodedArray = json.load(read_file)
+    return decodedArray     
 
-def save_pickle(path, obj):
+
+def save_json(path, obj):
     with open(path, 'wb') as file:
         pickle.dump(obj, file)
 

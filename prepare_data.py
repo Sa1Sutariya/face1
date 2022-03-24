@@ -1,15 +1,21 @@
+import ast
+import json
 import os
-import pickle
 import numpy as np
 import cv2
 import mtcnn
 from keras.models import load_model
-from utils import get_face, get_encode, l2_normalizer, normalize
+from utils import get_face, l2_normalizer, load_json, normalize
 
+class NumpyArrayEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        return json.JSONEncoder.default(self, obj)
 # hyper-parameters
-encoder_model = 'C:/Users/sutar/Downloads/Face-master/_03_facenet_keras/facenet_keras.h5'
-people_dir = 'data/people'
-encodings_path = 'C:/Users/sutar/Downloads/Face-master/_03_facenet_keras/encodings.pkl'
+encoder_model = 'facenet_keras.h5'
+
+encodings_path = os.path.join(os.getcwd(), 'encodings.json')
 required_size = (160, 160)
 
 face_detector = mtcnn.MTCNN()
@@ -17,13 +23,12 @@ face_encoder = load_model(encoder_model)
 
 encoding_dict = dict()
 
-def addpd(img_path,person_name):
-    # for person_name in os.listdir(people_dir):
-    #     person_dir = os.path.join(people_dir, person_name)
+def Prepare_data(img_path,person_name):
+    for person_name1 in os.listdir(img_path):
+        person_dir = os.path.join(img_path, person_name1)
+
     encodes = []
-#     for img_name in os.listdir(person_dir):
-#         img_path = os.path.join(person_dir, img_name)
-    img = cv2.imread(img_path)
+    img = cv2.imread(person_dir)
     img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     results = face_detector.detect_faces(img_rgb)
     if results:
@@ -40,9 +45,29 @@ def addpd(img_path,person_name):
         encode = l2_normalizer.transform(np.expand_dims(encode, axis=0))[0]
         encoding_dict[person_name] = encode
 
-
     for key in encoding_dict.keys():
-        print(key)
+        with open('sample.json', 'r') as openfile:
+            json_object = json.load(openfile)
+        json_object.append(key)
+        asd= list(set(json_object))
+        json_string = json.dumps(asd, indent = 4)
+        with open("sample.json", "w") as outfile:
+            outfile.write(json_string)
 
-    with open(encodings_path, 'bw') as file:
-        pickle.dump(encoding_dict, file)
+    for person_name1 in os.listdir(img_path):
+        person_dir = os.path.join(img_path, person_name1)  
+        try:
+            os.remove(person_dir) 
+        except:
+            pass
+    os.rmdir(img_path)        
+       
+    json_object = json.dumps(load_json(encodings_path),cls=NumpyArrayEncoder)
+    Con_Dict = ast.literal_eval(json_object)
+    Con_Dict.update(encoding_dict)
+    json_update = json.dumps(Con_Dict,cls=NumpyArrayEncoder)
+
+    with open(encodings_path, "w") as outfile:
+        outfile.write(json_update) 
+        outfile.close()   
+
