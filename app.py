@@ -143,4 +143,5 @@ def get_img1():
 
 
 if __name__ == "__main__":
-    app.run(debug=False, threaded=False, port=4000)
+    app.run(debug=False)
+    # app.run(debug=False, threaded=False, port=4000)
