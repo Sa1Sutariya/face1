@@ -8,9 +8,9 @@ from io import BytesIO
 from Recognition import Recognition
 import json
 from prepare_data import Prepare_data
-import logging 
-
-logging.basicConfig(filename='app.log', filemode='w', format='%(name)s - %(levelname)s - %(message)s',level=logging.debug)
+# import logging 
+# 
+# logging.basicConfig(filename='app.log', filemode='w', format='%(name)s - %(levelname)s - %(message)s',level=logging.debug)
 
 
 app = Flask(__name__)
@@ -144,4 +144,4 @@ def get_img1():
 
 if __name__ == "__main__":
     app.run(debug=False)
-    # app.run(debug=False, threaded=False, port=4000)
+    # app.run(debug=False   , threaded=False, port=4000)
